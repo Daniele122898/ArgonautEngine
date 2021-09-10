@@ -5,7 +5,8 @@
 #ifndef ENGINE_TYPES_H
 #define ENGINE_TYPES_H
 
+namespace Argonaut {
 // Unit types
-typedef unsigned int uint;
-
+    typedef unsigned int uint;
+}
 #endif //ENGINE_TYPES_H

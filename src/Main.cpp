@@ -6,7 +6,6 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include "Base/Types.h"
 #include "Renderer/Shader.h"
@@ -23,6 +22,8 @@ std::string readFileToString(std::string const& path);
 
 int main()
 {
+    using namespace Argonaut;
+
     Argonaut::Log::Init();
 
     AG_CORE_INFO("Setting up stuff");
