@@ -55,8 +55,8 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
 	// Building Shader
-    Argonaut::Shader shader(R"(F:\Coding\Cpp\ArgonautEngine\Engine\src\Renderer\Shaders\Simple\simple_vert.glsl)",
-                  R"(F:\Coding\Cpp\ArgonautEngine\Engine\src\Renderer\Shaders\Simple\simple_frag.glsl)");
+    Argonaut::Shader shader("src/Renderer/Shaders/Simple/simple_vert.glsl",
+                  "src/Renderer/Shaders/Simple/simple_frag.glsl");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -140,10 +140,10 @@ int main()
     glBindVertexArray(0);
 
     // Create Texture
-    Argonaut::Texture texture(R"(F:\Coding\Cpp\ArgonautEngine\Engine\assets\Textures\Simple\container.jpg)", GL_RGB);
+    Argonaut::Texture texture("assets/Textures/Simple/container.jpg", GL_RGB);
     texture.LoadTexture();
 
-    Argonaut::Texture texture2(R"(F:\Coding\Cpp\ArgonautEngine\Engine\assets\Textures\Simple\awesomeface.png)", GL_RGBA);
+    Argonaut::Texture texture2("assets/Textures/Simple/awesomeface.png", GL_RGBA);
     texture2.LoadTexture(true);
 
     shader.use();
