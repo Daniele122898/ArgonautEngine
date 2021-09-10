@@ -26,7 +26,7 @@ int main()
 
     Argonaut::Log::Init();
 
-    AG_CORE_INFO("Setting up stuff");
+    AG_CORE_INFO("Initializing Argonaut Engine");
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -164,16 +164,13 @@ int main()
     // create view matrix that moves the world away from us
     glm::mat4 view = glm::mat4(1.0f);
     // we translate the scene in the reverse direction of where we want to move
-    view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
+//    view = glm::translate(view, glm::vec3(0.f, 0.f, -3.f));
 
     // projection matrix
 //    glm::mat4 ortho = glm::ortho(0.0f, (float)ARGONAUT_WINDOW_WIDTH, 0.0f, (float)ARGONAUT_WINDOW_HEIGHT, 0.1f, 100.f);
     glm::mat4 proj = glm::perspective(glm::radians(45.f), (float)ARGONAUT_WINDOW_WIDTH / (float)ARGONAUT_WINDOW_HEIGHT, 0.1f, 100.f);
     shader.setMat4("projection", proj);
     shader.setFloat("mixRate", 0.3f);
-    shader.setMat4("view", view);
-
-    double oldTime = glfwGetTime();
 
     glm::vec3 cubePositions[] = {
             glm::vec3( 0.0f,  0.0f,  0.0f),
@@ -188,6 +185,23 @@ int main()
             glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
+    // Camera stuff
+    v3 cameraPos = v3(0.f, 0.f, 3.f);
+    // Remember that substracting the camera pos from the camera target gives us
+    // a vector that starts at the camera target and goes to the cameraPosition
+    v3 cameraTarget = v3(0.f, 0.f, 0.f);
+    v3 invCameraDir = glm::normalize(cameraPos - cameraTarget);
+
+    // Get vector that points in the positive x axis direction
+    v3 up = v3(0.f, 1.f, 0.f);
+    v3 cameraRight = glm::normalize(glm::cross(up, invCameraDir));
+    v3 cameraUp = glm::cross(invCameraDir, cameraRight);
+
+    //  Create lookat matrix to translate and rotate the world around the camera
+    view = glm::lookAt(cameraPos, cameraTarget, up);
+    shader.setMat4("view", view);
+
+    double oldTime = glfwGetTime();
     // render loop
     uint count = 0;
 	while (!glfwWindowShouldClose(window))

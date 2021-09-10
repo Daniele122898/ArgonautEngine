@@ -5,8 +5,11 @@
 #ifndef ENGINE_TYPES_H
 #define ENGINE_TYPES_H
 
+#include <glm/glm.hpp>
+
 namespace Argonaut {
 // Unit types
     typedef unsigned int uint;
+    typedef glm::vec3 v3;
 }
 #endif //ENGINE_TYPES_H
