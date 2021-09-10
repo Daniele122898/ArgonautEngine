@@ -230,6 +230,14 @@ int main()
         texture2.UseTexture(GL_TEXTURE1);
         glBindVertexArray(VAO);
 
+        // rotating around crates
+//        const float radius = 10.0f;
+//        double camX = sin(glfwGetTime()) * radius;
+//        double camZ = cos(glfwGetTime()) * radius;
+//        view = glm::mat4(1.f);
+//        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+//        shader.setMat4("view", view);
+
         // transformation matrices
 //        model = glm::mat4(1.0f);
         for (int i = 0; i < 10; ++i) {
