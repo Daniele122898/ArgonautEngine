@@ -10,6 +10,7 @@
 #include "Base/Types.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
+#include "Renderer/GLFWWindow.h"
 #include "Base/Log.h"
 
 // globals
@@ -28,31 +29,7 @@ int main()
 
     AG_CORE_INFO("Initializing Argonaut Engine");
 
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(ARGONAUT_WINDOW_WIDTH, ARGONAUT_WINDOW_HEIGHT, "ArgonautEngine", nullptr, nullptr);
-	if (window == nullptr)
-	{
-        AG_CORE_CRITICAL("Failed to create GLFW window");
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-        AG_CORE_CRITICAL("Failed to initialize GLAD");
-        glfwTerminate();
-		return -1;
-	}
-
-	glViewport(0, 0, ARGONAUT_WINDOW_WIDTH, ARGONAUT_WINDOW_HEIGHT);
-	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-
-    glEnable(GL_DEPTH_TEST);
+    Argonaut::GLFWWindow agWindow = Argonaut::GLFWWindow(ARGONAUT_WINDOW_WIDTH, ARGONAUT_WINDOW_HEIGHT, "Argonaut Engine");
 
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/simple_vert.glsl",
@@ -204,7 +181,7 @@ int main()
     double oldTime = glfwGetTime();
     // render loop
     uint count = 0;
-	while (!glfwWindowShouldClose(window))
+	while (!agWindow.ShouldClose())
 	{
         double currentTime = glfwGetTime();
         double deltaTime = currentTime - oldTime;
@@ -213,13 +190,13 @@ int main()
             double fps = 1.0/deltaTime;
 //            std::string title = fmt::format("ArgonautEngine | FPS: {}", fps);
             std::string title = std::to_string(fps);
-            glfwSetWindowTitle(window, title.c_str());
+            agWindow.SetTitle(title);
             count = 0;
             std::destroy(title.begin(), title.end());
         }
         oldTime = currentTime;
 		// Input handling
-		processInput(window);
+		processInput(agWindow.GetMainWindow());
 
 		// Rendering
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // state setting function
@@ -253,7 +230,7 @@ int main()
 //		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		// Swap buffers and check poll IO events
-		glfwSwapBuffers(window);
+		agWindow.SwapBuffers();
 		glfwPollEvents();
 	}
 

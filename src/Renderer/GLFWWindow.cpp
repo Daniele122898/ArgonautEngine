@@ -65,4 +65,9 @@ namespace Argonaut {
 
         return 0;
     }
+
+    void GLFWWindow::SetTitle(std::string windowTitle) {
+        title = std::move(windowTitle);
+        glfwSetWindowTitle(window, title.c_str());
+    }
 }

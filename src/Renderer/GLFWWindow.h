@@ -19,6 +19,23 @@ namespace Argonaut {
 
         int Initialize();
 
+        [[nodiscard]]
+        bool ShouldClose() const {return glfwWindowShouldClose(window); }
+        void SetTitle(std::string windowTitle);
+        void SwapBuffers() { glfwSwapBuffers(window); }
+
+        [[nodiscard]]
+        int GetBufferWidth() const { return bufferWidth; }
+        [[nodiscard]]
+        int GetBufferHeight() const { return bufferHeight; }
+
+        // TODO Remove this
+        /**
+        * If you use this function it is most likely a bad idea. Will be replaced with custom
+        * window functions
+        */
+        [[nodiscard]]
+        GLFWwindow* GetMainWindow() const {return window;}
 
     private:
         int width;
