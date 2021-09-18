@@ -30,6 +30,11 @@ int main()
     AG_CORE_INFO("Initializing Argonaut Engine");
 
     Argonaut::GLFWWindow agWindow = Argonaut::GLFWWindow(ARGONAUT_WINDOW_WIDTH, ARGONAUT_WINDOW_HEIGHT, "Argonaut Engine");
+    if (!agWindow.Initialize()) {
+        AG_CORE_CRITICAL("Failed to initialize Argonaut Window");
+        glfwTerminate();
+        return 1;
+    }
 
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/simple_vert.glsl",
@@ -180,20 +185,11 @@ int main()
 
     double oldTime = glfwGetTime();
     // render loop
-    uint count = 0;
 	while (!agWindow.ShouldClose())
 	{
         double currentTime = glfwGetTime();
-        double deltaTime = currentTime - oldTime;
-        ++count;
-        if (count == 100) {
-            double fps = 1.0/deltaTime;
-//            std::string title = fmt::format("ArgonautEngine | FPS: {}", fps);
-            std::string title = std::to_string(fps);
-            agWindow.SetTitle(title);
-            count = 0;
-            std::destroy(title.begin(), title.end());
-        }
+        [[maybe_unused]] double deltaTime = currentTime - oldTime;
+
         oldTime = currentTime;
 		// Input handling
 		processInput(agWindow.GetMainWindow());

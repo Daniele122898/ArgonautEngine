@@ -17,7 +17,7 @@ namespace Argonaut {
         GLFWWindow();
         GLFWWindow(int windowWidth, int windowHeight, std::string title);
 
-        int Initialize();
+        bool Initialize();
 
         [[nodiscard]]
         bool ShouldClose() const {return glfwWindowShouldClose(window); }

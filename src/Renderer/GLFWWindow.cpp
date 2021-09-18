@@ -27,11 +27,11 @@ namespace Argonaut {
         window = nullptr;
     }
 
-    int GLFWWindow::Initialize() {
+    bool GLFWWindow::Initialize() {
         if (!glfwInit()) {
             AG_CORE_CRITICAL("Failed to initialize glfw");
             glfwTerminate();
-            return 1;
+            return false;
         }
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,7 +43,7 @@ namespace Argonaut {
         {
             AG_CORE_CRITICAL("Failed to create GLFW window");
             glfwTerminate();
-            return 1;
+            return false;
         }
 
         glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
@@ -53,7 +53,7 @@ namespace Argonaut {
         {
             AG_CORE_CRITICAL("Failed to initialize GLAD");
             glfwTerminate();
-            return -1;
+            return false;
         }
 
         glEnable(GL_DEPTH_TEST);
@@ -63,7 +63,7 @@ namespace Argonaut {
         // So the window has a pointer to this class
         glfwSetWindowUserPointer(window, this);
 
-        return 0;
+        return true;
     }
 
     void GLFWWindow::SetTitle(std::string windowTitle) {
