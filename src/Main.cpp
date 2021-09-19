@@ -18,8 +18,13 @@ const int ARGONAUT_WINDOW_WIDTH = 1280;
 const int ARGONAUT_WINDOW_HEIGHT = 720;
 
 void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, double deltaTime);
 std::string readFileToString(std::string const& path);
+
+Argonaut::v3 cameraPos;
+Argonaut::v3 cameraTarget;
+Argonaut::v3 cameraUp;
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 
 int main()
 {
@@ -168,31 +173,35 @@ int main()
     };
 
     // Camera stuff
-    v3 cameraPos = v3(0.f, 0.f, 3.f);
+    cameraPos = v3(0.f, 0.f, 3.f);
     // Remember that substracting the camera pos from the camera target gives us
     // a vector that starts at the camera target and goes to the cameraPosition
-    v3 cameraTarget = v3(0.f, 0.f, 0.f);
+    cameraTarget = v3(0.f, 0.f, 0.f);
     v3 invCameraDir = glm::normalize(cameraPos - cameraTarget);
 
     // Get vector that points in the positive x axis direction
     v3 up = v3(0.f, 1.f, 0.f);
     v3 cameraRight = glm::normalize(glm::cross(up, invCameraDir));
-    v3 cameraUp = glm::cross(invCameraDir, cameraRight);
+    cameraUp = glm::cross(invCameraDir, cameraRight);
 
     //  Create lookat matrix to translate and rotate the world around the camera
     view = glm::lookAt(cameraPos, cameraTarget, up);
     shader.setMat4("view", view);
+
+    // stuff for walking
+    cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+    cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
 
     double oldTime = glfwGetTime();
     // render loop
 	while (!agWindow.ShouldClose())
 	{
         double currentTime = glfwGetTime();
-        [[maybe_unused]] double deltaTime = currentTime - oldTime;
+        double deltaTime = currentTime - oldTime;
 
         oldTime = currentTime;
 		// Input handling
-		processInput(agWindow.GetMainWindow());
+		processInput(agWindow.GetMainWindow(), deltaTime);
 
 		// Rendering
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // state setting function
@@ -210,6 +219,10 @@ int main()
 //        view = glm::mat4(1.f);
 //        view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 //        shader.setMat4("view", view);
+
+        // update view for movement
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        shader.setMat4("view", view);
 
         // transformation matrices
 //        model = glm::mat4(1.0f);
@@ -248,7 +261,7 @@ std::string readFileToString(std::string const& path) {
 	return buffer.str();
 }
 
-void processInput(GLFWwindow* window)
+void processInput(GLFWwindow* window, double deltaTime)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -256,6 +269,18 @@ void processInput(GLFWwindow* window)
 	    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    // Camera movement
+    const float cameraSpeed = 5.f;
+    float dtf = (float)deltaTime;
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += (dtf * cameraSpeed) * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= (dtf * cameraSpeed) * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * (dtf * cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * (dtf * cameraSpeed);
 }
 
 void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int height)
