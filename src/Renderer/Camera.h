@@ -27,8 +27,6 @@ namespace Argonaut {
 
         m4 CalculateViewMatrix();
 
-        ~Camera();
-
     private:
         v3 position;
         v3 front;
