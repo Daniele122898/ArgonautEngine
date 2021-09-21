@@ -31,14 +31,14 @@ namespace Argonaut {
         [[nodiscard]]
         int GetBufferHeight() const { return bufferHeight; }
         [[nodiscard]]
-        double GetXChange() const { return xChange; }
+        double GetXChange();
         [[nodiscard]]
-        double GetYChange() const {return yChange; }
+        double GetYChange();
         [[nodiscard]]
         bool GetKeyPressed(int key) const;
         // TODO absolutely remove this and move it to an event based system
         [[nodiscard]]
-        const bool* GetKeys() const { return keys; }
+        bool* GetKeys() { return keys; }
 
         // TODO Remove this
         /**
@@ -68,7 +68,7 @@ namespace Argonaut {
         void createCallbacks();
 
         // TODO replace all of this with event based systems!
-        static void handleKeys(GLFWwindow* window, int key, int code, int action, int mode);
+        static void handleKeys(GLFWwindow* window, int key, [[maybe_unused]] int code, int action, [[maybe_unused]] int mode);
         static void handleMouseFirst(GLFWwindow* window, double xPos, double yPos);
         static void handleMouse(GLFWwindow* window, double xPos, double yPos);
     };

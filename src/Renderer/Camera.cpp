@@ -49,9 +49,6 @@ namespace Argonaut {
             position += worldUp * vel;
         if (keys[GLFW_KEY_LEFT_CONTROL])
             position -= worldUp * vel;
-
-
-
     }
 
     void Camera::MouseControls(double xChange, double yChange) {
@@ -82,7 +79,7 @@ namespace Argonaut {
         front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
         front.y = sin(glm::radians(pitch));
         front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        glm::normalize(front);
+        front = glm::normalize(front);
 
         right = glm::normalize(glm::cross(front, worldUp));
         up = glm::normalize(glm::cross(right, front));

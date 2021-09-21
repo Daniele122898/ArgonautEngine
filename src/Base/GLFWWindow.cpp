@@ -15,6 +15,12 @@ namespace Argonaut {
         title = "Argonaut Engine";
 
         window = nullptr;
+
+        lastX = 0;
+        lastY = 0;
+        xChange = 0;
+        yChange = 0;
+        memset(keys, 0, sizeof(bool) * 1024);
     }
 
     GLFWWindow::GLFWWindow(int windowWidth, int windowHeight, std::string title) {
@@ -25,6 +31,12 @@ namespace Argonaut {
         this->title = std::move(title);
 
         window = nullptr;
+
+        lastX = 0;
+        lastY = 0;
+        xChange = 0;
+        yChange = 0;
+        memset(keys, 0, sizeof(bool) * 1024);
     }
 
     bool GLFWWindow::Initialize() {
@@ -82,7 +94,7 @@ namespace Argonaut {
         glfwSetCursorPosCallback(window, handleMouseFirst);
     }
 
-    void GLFWWindow::handleKeys(GLFWwindow *window, int key, int code, int action, int mode) {
+    void GLFWWindow::handleKeys(GLFWwindow *window, int key, [[maybe_unused]] int code, int action, [[maybe_unused]] int mode) {
         GLFWWindow* win = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
 
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -92,7 +104,11 @@ namespace Argonaut {
         if (key < 0 || key > 1024)
             return;
 
-        win->keys[key] = action == GLFW_PRESS;
+//        win->keys[key] = action == GLFW_PRESS;
+        if (action == GLFW_PRESS)
+            win->keys[key] = true;
+        else if (action == GLFW_RELEASE)
+            win ->keys[key] = false;
     }
 
     bool GLFWWindow::GetKeyPressed(int key) const {
@@ -106,7 +122,6 @@ namespace Argonaut {
     /// I just split it into a one time call. Seems better in my eyes.
     void GLFWWindow::handleMouseFirst(GLFWwindow *window, double xPos, double yPos) {
         GLFWWindow* win = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
-
         win->lastX = xPos;
         win->lastY = yPos;
 
@@ -130,5 +145,17 @@ namespace Argonaut {
         glfwDestroyWindow(window);
         // For now we assume we only have 1 Window at any time.
         glfwTerminate();
+    }
+
+    double GLFWWindow::GetXChange() {
+        double change = xChange;
+        xChange = 0;
+        return change;
+    }
+
+    double GLFWWindow::GetYChange() {
+        double change = yChange;
+        yChange = 0;
+        return change;
     }
 }
