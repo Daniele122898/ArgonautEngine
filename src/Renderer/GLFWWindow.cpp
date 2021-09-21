@@ -70,4 +70,8 @@ namespace Argonaut {
         title = std::move(windowTitle);
         glfwSetWindowTitle(window, title.c_str());
     }
+
+    void GLFWWindow::DisableCursor() {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
 }

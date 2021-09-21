@@ -23,6 +23,7 @@ namespace Argonaut {
         bool ShouldClose() const {return glfwWindowShouldClose(window); }
         void SetTitle(std::string windowTitle);
         void SwapBuffers() { glfwSwapBuffers(window); }
+        void DisableCursor();
 
         [[nodiscard]]
         int GetBufferWidth() const { return bufferWidth; }

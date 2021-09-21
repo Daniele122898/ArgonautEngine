@@ -20,11 +20,16 @@ const int ARGONAUT_WINDOW_HEIGHT = 720;
 void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, double deltaTime);
 std::string readFileToString(std::string const& path);
+void mouse_callback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos);
 
 Argonaut::v3 cameraPos;
 Argonaut::v3 cameraTarget;
 Argonaut::v3 cameraUp;
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+double lastX = ARGONAUT_WINDOW_WIDTH/2., lastY = ARGONAUT_WINDOW_HEIGHT/2.;
+float yaw = -90.f;
+float pitch = 0.f;
 
 int main()
 {
@@ -40,6 +45,10 @@ int main()
         glfwTerminate();
         return 1;
     }
+
+    agWindow.DisableCursor();
+    // TODO Move to camera class and window class!
+    glfwSetCursorPosCallback(agWindow.GetMainWindow(), mouse_callback);
 
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/simple_vert.glsl",
@@ -259,6 +268,41 @@ std::string readFileToString(std::string const& path) {
 	buffer << stream.rdbuf();
 	stream.close();
 	return buffer.str();
+}
+
+void mouse_callback([[maybe_unused]] GLFWwindow* window, double xpos, double ypos) {
+    // TODO fix sudden jump on first entry caused by the lastx being extremely different
+    // to the position ur mouse entered the screen from.
+
+    double xoffset = xpos - lastX;
+    // reversed since y-coords range from bottom to top otherwise we would have
+    // reversed pitch
+    double yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += (float)xoffset;
+    pitch += (float) yoffset;
+
+    if(pitch > 89.0f)
+        pitch =  89.0f;
+    if(pitch < -89.0f)
+        pitch = -89.0f;
+
+    // Camera lookaround
+    // yaw is the counter-clockwise angle starting from the x axis
+    // then use trigonometry to get. Similar for the rest
+    // https://learnopengl.com/img/getting-started/camera_yaw.png
+    // https://learnopengl.com/img/getting-started/camera_pitch.png
+    Argonaut::v3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
 }
 
 void processInput(GLFWwindow* window, double deltaTime)
