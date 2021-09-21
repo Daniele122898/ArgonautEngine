@@ -63,6 +63,8 @@ namespace Argonaut {
         // So the window has a pointer to this class
         glfwSetWindowUserPointer(window, this);
 
+        createCallbacks();
+
         return true;
     }
 
@@ -73,5 +75,60 @@ namespace Argonaut {
 
     void GLFWWindow::DisableCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    void GLFWWindow::createCallbacks() {
+        glfwSetKeyCallback(window, handleKeys);
+        glfwSetCursorPosCallback(window, handleMouseFirst);
+    }
+
+    void GLFWWindow::handleKeys(GLFWwindow *window, int key, int code, int action, int mode) {
+        GLFWWindow* win = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, GL_TRUE);
+        }
+
+        if (key < 0 || key > 1024)
+            return;
+
+        win->keys[key] = action == GLFW_PRESS;
+    }
+
+    bool GLFWWindow::GetKeyPressed(int key) const {
+        if (key < 0 || key > 1024)
+            return false;
+        return keys[key];
+    }
+
+    /// This is to eliminate the mouse jump when first entering the screen
+    /// Instead of checking on every callback if its the first mouse movement
+    /// I just split it into a one time call. Seems better in my eyes.
+    void GLFWWindow::handleMouseFirst(GLFWwindow *window, double xPos, double yPos) {
+        GLFWWindow* win = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+
+        win->lastX = xPos;
+        win->lastY = yPos;
+
+        glfwSetCursorPosCallback(window, handleMouse);
+        handleMouse(window, xPos, yPos);
+    }
+
+    void GLFWWindow::handleMouse(GLFWwindow *window, double xPos, double yPos) {
+        GLFWWindow* win = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+
+        win->xChange = xPos - win->lastX;
+        // reversed since y-coords range from bottom to top otherwise we would have reversed pitch
+        win->yChange = win->lastY - yPos;
+
+        win->lastX = xPos;
+        win->lastY = yPos;
+    }
+
+    GLFWWindow::~GLFWWindow() {
+        AG_CORE_INFO("Window {} has reached destructor.", title);
+        glfwDestroyWindow(window);
+        // For now we assume we only have 1 Window at any time.
+        glfwTerminate();
     }
 }

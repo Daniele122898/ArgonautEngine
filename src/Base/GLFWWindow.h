@@ -16,6 +16,7 @@ namespace Argonaut {
     public:
         GLFWWindow();
         GLFWWindow(int windowWidth, int windowHeight, std::string title);
+        ~GLFWWindow();
 
         bool Initialize();
 
@@ -29,6 +30,12 @@ namespace Argonaut {
         int GetBufferWidth() const { return bufferWidth; }
         [[nodiscard]]
         int GetBufferHeight() const { return bufferHeight; }
+        [[nodiscard]]
+        double GetXChange() const { return xChange; }
+        [[nodiscard]]
+        double GetYChange() const {return yChange; }
+        [[nodiscard]]
+        bool GetKeyPressed(int key) const;
 
         // TODO Remove this
         /**
@@ -39,14 +46,28 @@ namespace Argonaut {
         GLFWwindow* GetMainWindow() const {return window;}
 
     private:
+        std::string title;
+        GLFWwindow *window;
+
         int width;
         int bufferWidth;
         int height;
         int bufferHeight;
 
-        std::string title;
+        // TODO move this to an event based system
+        bool keys[1024];
 
-        GLFWwindow *window;
+        double lastX;
+        double lastY;
+        double xChange;
+        double yChange;
+
+        void createCallbacks();
+
+        // TODO replace all of this with event based systems!
+        static void handleKeys(GLFWwindow* window, int key, int code, int action, int mode);
+        static void handleMouseFirst(GLFWwindow* window, double xPos, double yPos);
+        static void handleMouse(GLFWwindow* window, double xPos, double yPos);
     };
 }
 
