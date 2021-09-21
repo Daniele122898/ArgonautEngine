@@ -3,6 +3,7 @@
 //
 
 #include "Camera.h"
+#include "../Base/Log.h"
 
 namespace Argonaut {
 
@@ -55,7 +56,9 @@ namespace Argonaut {
         xChange *= sensitivity;
         yChange *= sensitivity;
 
-        yaw += static_cast<float>(xChange);
+        // Constrain the yaw such that it does not become increasingly large and go beyond
+        // floating point precision
+        yaw = glm::mod(yaw + static_cast<float>(xChange), 360.f);
         pitch += static_cast<float>(yChange);
 
         if (pitch > 89.f)
