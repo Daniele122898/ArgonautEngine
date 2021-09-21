@@ -293,11 +293,7 @@ void mouse_callback([[maybe_unused]] GLFWwindow* window, double xpos, double ypo
     if(pitch < -89.0f)
         pitch = -89.0f;
 
-    // Camera lookaround
-    // yaw is the counter-clockwise angle starting from the x axis
-    // then use trigonometry to get. Similar for the rest
-    // https://learnopengl.com/img/getting-started/camera_yaw.png
-    // https://learnopengl.com/img/getting-started/camera_pitch.png
+
     Argonaut::v3 direction;
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));

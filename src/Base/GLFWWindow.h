@@ -36,6 +36,9 @@ namespace Argonaut {
         double GetYChange() const {return yChange; }
         [[nodiscard]]
         bool GetKeyPressed(int key) const;
+        // TODO absolutely remove this and move it to an event based system
+        [[nodiscard]]
+        const bool* GetKeys() const { return keys; }
 
         // TODO Remove this
         /**

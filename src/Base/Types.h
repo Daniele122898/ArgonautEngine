@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 
 namespace Argonaut {
-// Unit types
+    // Unit types
     typedef unsigned int uint;
     typedef glm::vec3 v3;
     typedef glm::mat4 m4;
