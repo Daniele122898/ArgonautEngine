@@ -10,7 +10,7 @@
 #include "Base/Types.h"
 #include "Renderer/Shader.h"
 #include "Renderer/Texture.h"
-#include "Renderer/GLFWWindow.h"
+#include "Base/GLFWWindow.h"
 #include "Base/Log.h"
 
 // globals

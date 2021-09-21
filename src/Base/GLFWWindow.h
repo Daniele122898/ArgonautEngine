@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 #include <string>
 
-#include "../Base/Log.h"
+#include "Log.h"
 
 namespace Argonaut {
     class GLFWWindow {
