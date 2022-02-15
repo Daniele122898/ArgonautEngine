@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.19)
 project(Engine)
 
 set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_C_COMPILER "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86/cl.exe")
+#set(CMAKE_CXX_COMPILER "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx86/x86/cl.exe")
 
 # Glad configuration
 set(GLAD_PROFILE "core" CACHE STRING "OpenGL profile")
