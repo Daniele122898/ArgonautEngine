@@ -41,6 +41,8 @@ int main()
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/light_vert.glsl",
                   "src/Renderer/Shaders/Simple/light_frag.glsl");
+    Argonaut::Shader lampShader("src/Renderer/Shaders/Simple/lamp_vert.glsl",
+                            "src/Renderer/Shaders/Simple/lamp_frag.glsl");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -100,30 +102,29 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-//    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3*sizeof(float)));
-//    glEnableVertexAttribArray(1);
-
-//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
-//    glEnableVertexAttribArray(1);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO
+    // as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
+    uint lampVAO;
+    glGenVertexArrays(1,  &lampVAO);
+    glBindVertexArray(lampVAO);
+    // We again want a cube so we can just bind the same vertex data again
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // set the atributes
+    glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+
     shader.use();
+    shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+    shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
     // GLM stuff
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    shader.setMat4("transform", trans);
-
     // All together: V_clip = M_projection * M_view * M_model * V_local
     // create model matrix such that our objects lays on the floor on the x axis
 //    glm::mat4 model = glm::mat4(1.0f);
@@ -140,6 +141,7 @@ int main()
     shader.setMat4("projection", proj);
 
     glm::vec3 cubePosition = glm::vec3( 0.0f,  0.0f,  0.0f);
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     // Camera stuff
     Camera camera = Camera(
@@ -150,6 +152,10 @@ int main()
 
     view = camera.CalculateViewMatrix();
     shader.setMat4("view", view);
+
+    lampShader.use();
+    lampShader.setMat4("view", view);
+    lampShader.setMat4("projection", proj);
 
     double oldTime = glfwGetTime();
     // render loop
@@ -163,20 +169,31 @@ int main()
 		processInput(agWindow.GetMainWindow());
 
 		// Rendering
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // state setting function
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // state setting function
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // state using function
-
-		shader.use();
-        glBindVertexArray(VAO);
 
         // update view for movement
         camera.KeyControls(agWindow.GetKeys(), deltaTime);
         camera.MouseControls(agWindow.GetXChange(), agWindow.GetYChange());
 
         view = camera.CalculateViewMatrix();
-        shader.setMat4("view", view);
 
         // transformation matrices
+        // lamp
+        lampShader.use();
+        glBindVertexArray(lampVAO);
+        lampShader.setMat4("view", view);
+
+        glm::mat4 lampModel = glm::mat4(1.0f);
+        lampModel = glm::translate(lampModel, lightPos);
+        lampModel = glm::scale(lampModel, glm::vec3(0.2f));
+        lampShader.setMat4("model", lampModel);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        shader.use();
+        glBindVertexArray(VAO);
+        shader.setMat4("view", view);
+        // cube
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePosition);
         shader.setMat4("model", model);
