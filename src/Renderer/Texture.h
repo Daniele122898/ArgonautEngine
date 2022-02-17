@@ -23,6 +23,8 @@ namespace Argonaut {
 
         void UseTexture(uint textureUnit) const;
 
+        [[nodiscard]] uint GetTextureId() const { return textureId; }
+
         ~Texture();
 
     private:

@@ -45,13 +45,11 @@ namespace Argonaut {
     }
 
     void Texture::UseTexture() const {
-//    glActiveTexture(0);
-//    glBindTexture(GL_TEXTURE_2D, textureId);
         this->UseTexture(0);
     }
 
     void Texture::UseTexture(uint textureUnit) const {
-        glActiveTexture(textureUnit);
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, textureId);
     }
 
