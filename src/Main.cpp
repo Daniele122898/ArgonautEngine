@@ -123,8 +123,6 @@ int main()
 
 
     shader.use();
-    shader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
     // GLM stuff
     // All together: V_clip = M_projection * M_view * M_model * V_local
@@ -144,7 +142,6 @@ int main()
 
     glm::vec3 cubePosition = glm::vec3( 0.0f,  0.0f,  0.0f);
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    shader.setVec3("lightPos", lightPos);
 
     // Camera stuff
     Camera camera = Camera(
@@ -156,6 +153,19 @@ int main()
     view = camera.CalculateViewMatrix();
     shader.setMat4("view", view);
     shader.setVec3("viewPos", camera.GetPosition());
+
+    // setup material
+    shader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+    shader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    shader.setFloat("material.shininess", 32.0f);
+
+    // set light
+    shader.setVec3("light.position", lightPos);
+    shader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+    // darken diffuse light a bit
+    shader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
+    shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
     lampShader.use();
     lampShader.setMat4("view", view);
@@ -182,7 +192,14 @@ int main()
 
         view = camera.CalculateViewMatrix();
 
-        // transformation matrices
+        glm::vec3 lightColor;
+        lightColor.x = (float)sin(glfwGetTime() * 2.0f);
+        lightColor.y = (float)sin(glfwGetTime() * 0.7f);
+        lightColor.z = (float)sin(glfwGetTime() * 1.3f);
+
+        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
         // lamp
         lampShader.use();
         glBindVertexArray(lampVAO);
@@ -192,6 +209,9 @@ int main()
         lampModel = glm::translate(lampModel, lightPos);
         lampModel = glm::scale(lampModel, glm::vec3(0.2f));
         lampShader.setMat4("model", lampModel);
+
+        lampShader.setVec3("lightColor", lightColor);
+
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         shader.use();
@@ -204,6 +224,10 @@ int main()
         shader.setMat4("model", model);
         glm::mat4 normal = glm::transpose(glm::inverse(model));
         shader.setMat3("normalM", glm::mat3(normal));
+
+
+        shader.setVec3("light.ambient", ambientColor);
+        shader.setVec3("light.diffuse", diffuseColor);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 

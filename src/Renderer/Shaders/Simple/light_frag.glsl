@@ -1,31 +1,43 @@
 #version 460 core
+struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+};
+
+struct Light {
+    vec3 position;
+
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+
 in vec3 FragPos;
 in vec3 Normal;
 
 out vec4 FragColor;
 
-uniform vec3 objectColor;
-uniform vec3 lightColor;
-uniform vec3 lightPos;
+uniform Light light;
+uniform Material material;
 uniform vec3 viewPos;
 
 void main()
 {
-    float ambientStrength = 0.1;
-    float specularStrength = 0.5;
-
     // ambient
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 ambient = material.ambient * light.ambient;
 
     // diffuse light
     vec3 norm = normalize(Normal);
     // Get vector that points from fragment to light
-    vec3 lightDir = normalize(lightPos - FragPos);
+    vec3 lightDir = normalize(light.position - FragPos);
     // get angle between light dir and normal vec
     float diff = max(dot(norm, lightDir), 0.0);
     // multiply with lightcolor resulting in darker diffuse component
     // the greater the angle between the two vectors
-    vec3 diffuse = diff*lightColor;
+    vec3 diffuse = light.diffuse * (diff * material.diffuse);
 
     // specular highlight
     // get vector from fragment to viewer
@@ -34,9 +46,9 @@ void main()
     // way around so we negate
     vec3 reflectDir = reflect(-lightDir, norm);
     // the power is the shininess. More shininess = more reflective less diffusing
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightColor;
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    vec3 specular = light.specular * (spec * material.specular);
 
-    vec3 result = (ambient + diffuse+ specular) * objectColor;
+    vec3 result = ambient + diffuse + specular;
     FragColor = vec4(result, 1.0);
 }
