@@ -143,7 +143,18 @@ int main()
     glm::mat4 proj = glm::perspective(glm::radians(45.f), (float)ARGONAUT_WINDOW_WIDTH / (float)ARGONAUT_WINDOW_HEIGHT, 0.1f, 100.f);
     shader.setMat4("projection", proj);
 
-    glm::vec3 cubePosition = glm::vec3( 0.0f,  0.0f,  0.0f);
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f,  0.0f,  0.0f),
+            glm::vec3( 2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f,  2.0f, -2.5f),
+            glm::vec3( 1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     // Camera stuff
@@ -175,6 +186,10 @@ int main()
     // darken diffuse light a bit
     shader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
     shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    // point light
+    shader.setFloat("light.constant",  1.0f);
+    shader.setFloat("light.linear",    0.09f);
+    shader.setFloat("light.quadratic", 0.032f);
 
     lampShader.use();
     lampShader.setMat4("view", view);
@@ -218,16 +233,23 @@ int main()
         shader.setMat4("view", view);
         shader.setVec3("viewPos", camera.GetPosition());
         // cube
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePosition);
-        shader.setMat4("model", model);
-        glm::mat4 normal = glm::transpose(glm::inverse(model));
-        shader.setMat3("normalM", glm::mat3(normal));
         texture.UseTexture(0);
         specular.UseTexture(1);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for(uint i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            shader.setMat4("model", model);
+            glm::mat4 normal = glm::transpose(glm::inverse(model));
+            shader.setMat3("normalM", glm::mat3(normal));
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
 //		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
