@@ -40,7 +40,7 @@ int main()
 
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/light_vert.glsl",
-                  "src/Renderer/Shaders/Simple/light_frag.glsl");
+                  "src/Renderer/Shaders/Simple/spotlight_frag.glsl");
     Argonaut::Shader lampShader("src/Renderer/Shaders/Simple/lamp_vert.glsl",
                             "src/Renderer/Shaders/Simple/lamp_frag.glsl");
 
@@ -181,7 +181,10 @@ int main()
     specular.LoadTexture();
 
     // set light
-    shader.setVec3("light.position", lightPos);
+    shader.setVec3("light.position", camera.GetPosition());
+    shader.setVec3("light.direction", camera.GetDirection());
+    shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+    shader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
     shader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
     // darken diffuse light a bit
     shader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
@@ -232,6 +235,8 @@ int main()
         shader.use();
         shader.setMat4("view", view);
         shader.setVec3("viewPos", camera.GetPosition());
+        shader.setVec3("light.position", camera.GetPosition());
+        shader.setVec3("light.direction", camera.GetDirection());
         // cube
         texture.UseTexture(0);
         specular.UseTexture(1);
