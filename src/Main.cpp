@@ -21,6 +21,8 @@ const int ARGONAUT_WINDOW_HEIGHT = 720;
 void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
+bool flashlightEnabled = false;
+
 int main()
 {
     using namespace Argonaut;
@@ -40,7 +42,7 @@ int main()
 
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/light_vert.glsl",
-                  "src/Renderer/Shaders/Simple/spotlight_frag.glsl");
+                  "src/Renderer/Shaders/Simple/light_frag.glsl");
     Argonaut::Shader lampShader("src/Renderer/Shaders/Simple/lamp_vert.glsl",
                             "src/Renderer/Shaders/Simple/lamp_frag.glsl");
 
@@ -155,7 +157,12 @@ int main()
             glm::vec3( 1.5f,  0.2f, -1.5f),
             glm::vec3(-1.3f,  1.0f, -1.5f)
     };
-    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+    glm::vec3 pointLightPositions[] = {
+            glm::vec3( 0.7f,  0.2f,  2.0f),
+            glm::vec3( 2.3f, -3.3f, -4.0f),
+            glm::vec3(-4.0f,  2.0f, -12.0f),
+            glm::vec3( 0.0f,  0.0f, -3.0f)
+    };
 
     // Camera stuff
     Camera camera = Camera(
@@ -180,19 +187,66 @@ int main()
     Argonaut::Texture specular("assets/Textures/Specular/container2_specular.png", GL_RGBA);
     specular.LoadTexture();
 
-    // set light
-    shader.setVec3("light.position", camera.GetPosition());
-    shader.setVec3("light.direction", camera.GetDirection());
-    shader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-    shader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
-    shader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+    // set lights
+    // SPOT LIGHT
+    shader.setVec3("spotLight.position", camera.GetPosition());
+    shader.setVec3("spotLight.direction", camera.GetDirection());
+    shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+    shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
+    shader.setVec3("spotLight.ambient",  0.f, 0.f, 0.f);
     // darken diffuse light a bit
-    shader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f);
-    shader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-    // point light
-    shader.setFloat("light.constant",  1.0f);
-    shader.setFloat("light.linear",    0.09f);
-    shader.setFloat("light.quadratic", 0.032f);
+    shader.setVec3("spotLight.diffuse",  0.7f, 0.7f, 0.7f);
+    shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+    // attenuation
+    shader.setFloat("spotLight.constant",  1.0f);
+    shader.setFloat("spotLight.linear",    0.09f);
+    shader.setFloat("spotLight.quadratic", 0.032f);
+
+    // DIRECTIONAL LIGHT
+    shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    shader.setVec3("dirLight.ambient",  0.05f, 0.05f, 0.05f);
+    shader.setVec3("dirLight.diffuse",  0.5f, 0.5f, 0.5f);
+    shader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+    // POINT LIGHTS
+    glm::vec3 pointLightDiffuseColors[] = {
+            glm::vec3( 0.8f, 0.8f, 0.8f),
+            glm::vec3(0.8f, 0.8f, 0.8f),
+            glm::vec3( 0.8f, 0.8f, 0.8f),
+            glm::vec3( 0.2f, 0.2f, 1.f),
+    };
+    // point light 1
+    shader.setVec3("pointLights[0].position", pointLightPositions[0]);
+    shader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    shader.setVec3("pointLights[0].diffuse", pointLightDiffuseColors[0]);
+    shader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    shader.setFloat("pointLights[0].constant", 1.0f);
+    shader.setFloat("pointLights[0].linear", 0.09f);
+    shader.setFloat("pointLights[0].quadratic", 0.032f);
+    // point light 2
+    shader.setVec3("pointLights[1].position", pointLightPositions[1]);
+    shader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    shader.setVec3("pointLights[1].diffuse", pointLightDiffuseColors[1]);
+    shader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    shader.setFloat("pointLights[1].constant", 1.0f);
+    shader.setFloat("pointLights[1].linear", 0.09f);
+    shader.setFloat("pointLights[1].quadratic", 0.032f);
+    // point light 3
+    shader.setVec3("pointLights[2].position", pointLightPositions[2]);
+    shader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    shader.setVec3("pointLights[2].diffuse", pointLightDiffuseColors[2]);
+    shader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    shader.setFloat("pointLights[2].constant", 1.0f);
+    shader.setFloat("pointLights[2].linear", 0.09f);
+    shader.setFloat("pointLights[2].quadratic", 0.032f);
+    // point light 4
+    shader.setVec3("pointLights[3].position", pointLightPositions[3]);
+    shader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    shader.setVec3("pointLights[3].diffuse", pointLightDiffuseColors[3]);
+    shader.setVec3("pointLights[3].specular", 0.2f, 0.2f, 1.0f);
+    shader.setFloat("pointLights[3].constant", 1.0f);
+    shader.setFloat("pointLights[3].linear", 0.09f);
+    shader.setFloat("pointLights[3].quadratic", 0.032f);
 
     lampShader.use();
     lampShader.setMat4("view", view);
@@ -211,7 +265,7 @@ int main()
 		processInput(agWindow.GetMainWindow());
 
 		// Rendering
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f); // state setting function
+		glClearColor(0.05f, 0.05f, 0.05f, 1.0f); // state setting function
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // state using function
 
         // update view for movement
@@ -220,26 +274,38 @@ int main()
 
         view = camera.CalculateViewMatrix();
 
-        // lamp
+        // Point Lights!
         lampShader.use();
         lampShader.setMat4("view", view);
-
-        glm::mat4 lampModel = glm::mat4(1.0f);
-        lampModel = glm::translate(lampModel, lightPos);
-        lampModel = glm::scale(lampModel, glm::vec3(0.2f));
-        lampShader.setMat4("model", lampModel);
-
         glBindVertexArray(lampVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for (int i =0; i<4; ++i) {
+            glm::mat4 lampModel = glm::mat4(1.0f);
+            lampModel = glm::translate(lampModel, pointLightPositions[i]);
+            lampModel = glm::scale(lampModel, glm::vec3(0.2f));
+            lampShader.setMat4("model", lampModel);
+            lampShader.setVec3("lightColor", pointLightDiffuseColors[i]);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
 
         shader.use();
         shader.setMat4("view", view);
         shader.setVec3("viewPos", camera.GetPosition());
-        shader.setVec3("light.position", camera.GetPosition());
-        shader.setVec3("light.direction", camera.GetDirection());
+        shader.setVec3("spotLight.position", camera.GetPosition());
+        shader.setVec3("spotLight.direction", camera.GetDirection());
         // cube
         texture.UseTexture(0);
         specular.UseTexture(1);
+
+        if (flashlightEnabled) {
+            shader.setVec3("spotLight.diffuse",  0.7f, 0.7f, 0.7f);
+            shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+        } else {
+            shader.setVec3("spotLight.diffuse",  0.f, 0.f, 0.f);
+            shader.setVec3("spotLight.specular", 0.f, 0.f, 0.f);
+        }
 
         glBindVertexArray(VAO);
 
@@ -280,6 +346,8 @@ void processInput(GLFWwindow* window)
 	    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+        flashlightEnabled = !flashlightEnabled;
 }
 
 void framebufferSizeCallback([[maybe_unused]] GLFWwindow* window, int width, int height)
