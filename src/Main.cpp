@@ -13,6 +13,8 @@
 #include "Base/GLFWWindow.h"
 #include "Renderer/Camera.h"
 #include "Base/Log.h"
+#include "Renderer/Light/DirectionalLight.h"
+#include "Renderer/Light/PointLight.h"
 
 // globals
 const int ARGONAUT_WINDOW_WIDTH = 1280;
@@ -203,10 +205,10 @@ int main()
     shader.setFloat("spotLight.quadratic", 0.032f);
 
     // DIRECTIONAL LIGHT
-    shader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    shader.setVec3("dirLight.ambient",  0.05f, 0.05f, 0.05f);
-    shader.setVec3("dirLight.diffuse",  0.5f, 0.5f, 0.5f);
-    shader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+    Argonaut::DirectionalLight dirLight(
+            {0.05f, 0.05f, 0.05f}, {0.5f, 0.5f, 0.5f},
+            {0.5f, 0.5f, 0.5f}, {-0.2f, -1.0f, -0.3f});
+    dirLight.UseLight(shader);
 
     // POINT LIGHTS
     glm::vec3 pointLightDiffuseColors[] = {
@@ -216,37 +218,25 @@ int main()
             glm::vec3( 0.2f, 0.2f, 1.f),
     };
     // point light 1
-    shader.setVec3("pointLights[0].position", pointLightPositions[0]);
-    shader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-    shader.setVec3("pointLights[0].diffuse", pointLightDiffuseColors[0]);
-    shader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    shader.setFloat("pointLights[0].constant", 1.0f);
-    shader.setFloat("pointLights[0].linear", 0.09f);
-    shader.setFloat("pointLights[0].quadratic", 0.032f);
+    Argonaut::PointLight pl1({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[0],
+                             {1.0f, 1.0f, 1.0f}, pointLightPositions[0],
+                             1.0f, 0.09f, 0.032f) ;
+    pl1.UseLight(shader, 0);
     // point light 2
-    shader.setVec3("pointLights[1].position", pointLightPositions[1]);
-    shader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-    shader.setVec3("pointLights[1].diffuse", pointLightDiffuseColors[1]);
-    shader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-    shader.setFloat("pointLights[1].constant", 1.0f);
-    shader.setFloat("pointLights[1].linear", 0.09f);
-    shader.setFloat("pointLights[1].quadratic", 0.032f);
+    Argonaut::PointLight pl2({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[1],
+                             {1.0f, 1.0f, 1.0f}, pointLightPositions[1],
+                             1.0f, 0.09f, 0.032f);
+    pl2.UseLight(shader, 1);
     // point light 3
-    shader.setVec3("pointLights[2].position", pointLightPositions[2]);
-    shader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-    shader.setVec3("pointLights[2].diffuse", pointLightDiffuseColors[2]);
-    shader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-    shader.setFloat("pointLights[2].constant", 1.0f);
-    shader.setFloat("pointLights[2].linear", 0.09f);
-    shader.setFloat("pointLights[2].quadratic", 0.032f);
+    Argonaut::PointLight pl3({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[2],
+                             {1.0f, 1.0f, 1.0f}, pointLightPositions[2],
+                             1.0f, 0.09f, 0.032f);
+    pl3.UseLight(shader, 2);
     // point light 4
-    shader.setVec3("pointLights[3].position", pointLightPositions[3]);
-    shader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-    shader.setVec3("pointLights[3].diffuse", pointLightDiffuseColors[3]);
-    shader.setVec3("pointLights[3].specular", 0.2f, 0.2f, 1.0f);
-    shader.setFloat("pointLights[3].constant", 1.0f);
-    shader.setFloat("pointLights[3].linear", 0.09f);
-    shader.setFloat("pointLights[3].quadratic", 0.032f);
+    Argonaut::PointLight pl4({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[3],
+                             {0.2f, 0.2f, 1.0f}, pointLightPositions[3],
+                             1.0f, 0.09f, 0.032f);
+    pl4.UseLight(shader, 3);
 
     lampShader.use();
     lampShader.setMat4("view", view);

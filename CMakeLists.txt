@@ -17,7 +17,7 @@ add_subdirectory(vendor/glfw)
 add_subdirectory(vendor/glm)
 
 # fmt configuration
-#add_subdirectory(vendor/fmt)
+add_subdirectory(vendor/fmt)
 
 # spdlog configuration
 add_subdirectory(vendor/spdlog)
@@ -34,4 +34,4 @@ else()
 endif()
 
 # Says that Engine wants to link against glfw and glad and then does magic and makes headers work.
-target_link_libraries(Engine PRIVATE glfw glad glm spdlog)
+target_link_libraries(Engine PRIVATE glfw glad glm spdlog fmt)

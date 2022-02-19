@@ -21,9 +21,9 @@ namespace Argonaut {
         bool Initialize();
 
         [[nodiscard]]
-        bool ShouldClose() const {return glfwWindowShouldClose(window); }
+        bool ShouldClose() const {return glfwWindowShouldClose(m_window); }
         void SetTitle(std::string windowTitle);
-        void SwapBuffers() { glfwSwapBuffers(window); }
+        void SwapBuffers() { glfwSwapBuffers(m_window); }
         void DisableCursor();
 
         [[nodiscard]]
@@ -46,11 +46,11 @@ namespace Argonaut {
         * window functions
         */
         [[nodiscard]]
-        GLFWwindow* GetMainWindow() const {return window;}
+        GLFWwindow* GetMainWindow() const {return m_window;}
 
     private:
-        std::string title;
-        GLFWwindow *window;
+        std::string m_title;
+        GLFWwindow *m_window;
 
         int width;
         int bufferWidth;

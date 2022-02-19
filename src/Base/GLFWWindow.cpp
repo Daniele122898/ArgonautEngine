@@ -12,9 +12,9 @@ namespace Argonaut {
         height = 600;
         bufferWidth = 0;
         bufferHeight = 0;
-        title = "Argonaut Engine";
+        m_title = "Argonaut Engine";
 
-        window = nullptr;
+        m_window = nullptr;
 
         lastX = 0;
         lastY = 0;
@@ -28,9 +28,9 @@ namespace Argonaut {
         height = windowHeight;
         bufferWidth = 0;
         bufferHeight = 0;
-        this->title = std::move(title);
+        this->m_title = std::move(title);
 
-        window = nullptr;
+        m_window = nullptr;
 
         lastX = 0;
         lastY = 0;
@@ -50,16 +50,16 @@ namespace Argonaut {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-        window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-        if (window == nullptr)
+        m_window = glfwCreateWindow(width, height, m_title.c_str(), nullptr, nullptr);
+        if (m_window == nullptr)
         {
             AG_CORE_CRITICAL("Failed to create GLFW window");
             glfwTerminate();
             return false;
         }
 
-        glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-        glfwMakeContextCurrent(window);
+        glfwGetFramebufferSize(m_window, &bufferWidth, &bufferHeight);
+        glfwMakeContextCurrent(m_window);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -73,7 +73,7 @@ namespace Argonaut {
         // Set width and height to the actual size inside the window we got when getting the buffer sizes
         glViewport(0, 0, bufferWidth, bufferHeight);
         // So the window has a pointer to this class
-        glfwSetWindowUserPointer(window, this);
+        glfwSetWindowUserPointer(m_window, this);
 
         createCallbacks();
 
@@ -81,17 +81,17 @@ namespace Argonaut {
     }
 
     void GLFWWindow::SetTitle(std::string windowTitle) {
-        title = std::move(windowTitle);
-        glfwSetWindowTitle(window, title.c_str());
+        m_title = std::move(windowTitle);
+        glfwSetWindowTitle(m_window, m_title.c_str());
     }
 
     void GLFWWindow::DisableCursor() {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
 
     void GLFWWindow::createCallbacks() {
-        glfwSetKeyCallback(window, handleKeys);
-        glfwSetCursorPosCallback(window, handleMouseFirst);
+        glfwSetKeyCallback(m_window, handleKeys);
+        glfwSetCursorPosCallback(m_window, handleMouseFirst);
     }
 
     void GLFWWindow::handleKeys(GLFWwindow *window, int key, [[maybe_unused]] int code, int action, [[maybe_unused]] int mode) {
@@ -141,8 +141,8 @@ namespace Argonaut {
     }
 
     GLFWWindow::~GLFWWindow() {
-        AG_CORE_INFO("Window {} has reached destructor.", title);
-        glfwDestroyWindow(window);
+        AG_CORE_INFO("Window {} has reached destructor.", m_title);
+        glfwDestroyWindow(m_window);
         // For now we assume we only have 1 Window at any time.
         glfwTerminate();
     }
