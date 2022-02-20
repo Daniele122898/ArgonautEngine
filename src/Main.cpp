@@ -15,6 +15,7 @@
 #include "Base/Log.h"
 #include "Renderer/Light/DirectionalLight.h"
 #include "Renderer/Light/PointLight.h"
+#include "Renderer/Light/SpotLight.h"
 
 // globals
 const int ARGONAUT_WINDOW_WIDTH = 1280;
@@ -191,23 +192,17 @@ int main()
 
     // set lights
     // SPOT LIGHT
-    shader.setVec3("spotLight.position", camera.GetPosition());
-    shader.setVec3("spotLight.direction", camera.GetDirection());
-    shader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-    shader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(17.5f)));
-    shader.setVec3("spotLight.ambient",  0.f, 0.f, 0.f);
-    // darken diffuse light a bit
-    shader.setVec3("spotLight.diffuse",  0.7f, 0.7f, 0.7f);
-    shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-    // attenuation
-    shader.setFloat("spotLight.constant",  1.0f);
-    shader.setFloat("spotLight.linear",    0.09f);
-    shader.setFloat("spotLight.quadratic", 0.032f);
+    Argonaut::SpotLight spotLight{
+            {0.f, 0.f, 0.f}, {0.7f, 0.7f, 0.7f}, {1.0f, 1.0f, 1.0f},
+            camera.GetPosition(), camera.GetDirection(),
+            12.5f, 17.5f,1.0f, 0.09f, 0.032f};
+    spotLight.UseLight(shader);
+//    spotLight.UpdateCutOffs(shader, 12.5f, 17.5f);
 
     // DIRECTIONAL LIGHT
-    Argonaut::DirectionalLight dirLight(
+    Argonaut::DirectionalLight dirLight{
             {0.05f, 0.05f, 0.05f}, {0.5f, 0.5f, 0.5f},
-            {0.5f, 0.5f, 0.5f}, {-0.2f, -1.0f, -0.3f});
+            {0.5f, 0.5f, 0.5f}, {-0.2f, -1.0f, -0.3f}};
     dirLight.UseLight(shader);
 
     // POINT LIGHTS
@@ -218,24 +213,24 @@ int main()
             glm::vec3( 0.2f, 0.2f, 1.f),
     };
     // point light 1
-    Argonaut::PointLight pl1({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[0],
+    Argonaut::PointLight pl1{{0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[0],
                              {1.0f, 1.0f, 1.0f}, pointLightPositions[0],
-                             1.0f, 0.09f, 0.032f) ;
+                             1.0f, 0.09f, 0.032f} ;
     pl1.UseLight(shader, 0);
     // point light 2
-    Argonaut::PointLight pl2({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[1],
+    Argonaut::PointLight pl2{{0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[1],
                              {1.0f, 1.0f, 1.0f}, pointLightPositions[1],
-                             1.0f, 0.09f, 0.032f);
+                             1.0f, 0.09f, 0.032f};
     pl2.UseLight(shader, 1);
     // point light 3
-    Argonaut::PointLight pl3({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[2],
+    Argonaut::PointLight pl3{{0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[2],
                              {1.0f, 1.0f, 1.0f}, pointLightPositions[2],
-                             1.0f, 0.09f, 0.032f);
+                             1.0f, 0.09f, 0.032f};
     pl3.UseLight(shader, 2);
     // point light 4
-    Argonaut::PointLight pl4({0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[3],
+    Argonaut::PointLight pl4{{0.05f, 0.05f, 0.05f}, pointLightDiffuseColors[3],
                              {0.2f, 0.2f, 1.0f}, pointLightPositions[3],
-                             1.0f, 0.09f, 0.032f);
+                             1.0f, 0.09f, 0.032f};
     pl4.UseLight(shader, 3);
 
     lampShader.use();
@@ -283,18 +278,16 @@ int main()
         shader.use();
         shader.setMat4("view", view);
         shader.setVec3("viewPos", camera.GetPosition());
-        shader.setVec3("spotLight.position", camera.GetPosition());
-        shader.setVec3("spotLight.direction", camera.GetDirection());
+        spotLight.UpdatePosition(shader, camera.GetPosition());
+        spotLight.UpdateDirection(shader, camera.GetDirection());
         // cube
         texture.UseTexture(0);
         specular.UseTexture(1);
 
         if (flashlightEnabled) {
-            shader.setVec3("spotLight.diffuse",  0.7f, 0.7f, 0.7f);
-            shader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+            spotLight.UseLight(shader);
         } else {
-            shader.setVec3("spotLight.diffuse",  0.f, 0.f, 0.f);
-            shader.setVec3("spotLight.specular", 0.f, 0.f, 0.f);
+            spotLight.DisableLight(shader);
         }
 
         glBindVertexArray(VAO);
