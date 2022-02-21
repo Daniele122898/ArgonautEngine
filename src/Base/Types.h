@@ -6,11 +6,18 @@
 #define ENGINE_TYPES_H
 
 #include <glm/glm.hpp>
+#include <vector>
 
 namespace Argonaut {
     // Unit types
     typedef unsigned int uint;
+
+    typedef glm::vec4 v4;
     typedef glm::vec3 v3;
+    typedef glm::vec2 v2;
     typedef glm::mat4 m4;
+
+    template<class T>
+    using vec = std::vector<T>;
 }
 #endif //ENGINE_TYPES_H
