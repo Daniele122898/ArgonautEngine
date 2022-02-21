@@ -22,6 +22,9 @@ add_subdirectory(vendor/fmt)
 # spdlog configuration
 add_subdirectory(vendor/spdlog)
 
+# assimp
+add_subdirectory(vendor/assimp)
+
 # Get recursively all .cpp and .hpp files in src subdir
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 # Variable Engine is executable from SOURCES defined above
@@ -34,4 +37,4 @@ else()
 endif()
 
 # Says that Engine wants to link against glfw and glad and then does magic and makes headers work.
-target_link_libraries(Engine PRIVATE glfw glad glm spdlog fmt)
+target_link_libraries(Engine PRIVATE glfw glad glm spdlog fmt assimp)

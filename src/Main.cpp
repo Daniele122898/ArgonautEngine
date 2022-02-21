@@ -3,7 +3,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -197,7 +196,6 @@ int main()
             camera.GetPosition(), camera.GetDirection(),
             12.5f, 17.5f,1.0f, 0.09f, 0.032f};
     spotLight.UseLight(shader);
-//    spotLight.UpdateCutOffs(shader, 12.5f, 17.5f);
 
     // DIRECTIONAL LIGHT
     Argonaut::DirectionalLight dirLight{
