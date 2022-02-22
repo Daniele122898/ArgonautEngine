@@ -107,6 +107,7 @@ namespace Argonaut {
             if (found) continue;
 
             Texture tex{path.c_str(), typeName};
+            tex.LoadTexture(true);
             textures.push_back(tex);
             m_textures.push_back(tex);
         }
