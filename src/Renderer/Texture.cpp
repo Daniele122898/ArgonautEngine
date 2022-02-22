@@ -10,15 +10,6 @@ namespace Argonaut {
         m_textureId = 0;
         m_width = m_height = m_bitDepth = 0;
         this->m_filePath = filePath;
-        m_imageFormat = GL_RGBA;
-        this->m_type = std::move(type);
-    }
-
-    Texture::Texture(const char *filePath, int imageFormat, std::string type) {
-        m_textureId = 0;
-        m_width = m_height = m_bitDepth = 0;
-        this->m_filePath = filePath;
-        this->m_imageFormat = imageFormat;
         this->m_type = std::move(type);
     }
 
@@ -39,7 +30,19 @@ namespace Argonaut {
         glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, m_imageFormat, m_width, m_height, 0, m_imageFormat, GL_UNSIGNED_BYTE, data);
+        GLenum format;
+        if (m_bitDepth == 1)
+            format = GL_RED;
+        else if (m_bitDepth == 3)
+            format = GL_RGB;
+        else if (m_bitDepth == 4)
+            format = GL_RGBA;
+        else {
+            AG_CORE_ERROR("Unrecognized bit depth during image load: {0}", m_bitDepth);
+            format = GL_RGBA;
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         stbi_image_free(data);

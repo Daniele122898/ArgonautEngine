@@ -18,7 +18,6 @@ namespace Argonaut {
     public:
         explicit Texture(const char *filePath, std::string type);
 
-        Texture(const char *filePath, int imageFormat, std::string type);
 
         bool LoadTexture(bool flipImage = false);
 
@@ -41,7 +40,6 @@ namespace Argonaut {
         void ClearTexture();
 
         uint m_textureId;
-        int m_imageFormat;
         int m_width, m_height, m_bitDepth;
 
         std::string m_type;
