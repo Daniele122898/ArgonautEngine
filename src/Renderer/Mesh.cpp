@@ -40,7 +40,7 @@ namespace Argonaut {
     void Mesh::Draw(Shader &shader) {
         uint diffNr = 1;
         uint specNr = 1;
-        for (int i = 0; i < m_textures.size(); ++i) {
+        for (uint i = 0; i < m_textures.size(); ++i) {
             auto tex = m_textures[i];
             auto typ = tex.GetType();
             std::string num;
@@ -49,6 +49,9 @@ namespace Argonaut {
                 num = std::to_string(diffNr++);
             else if (typ == "texture_specular")
                 num = std::to_string(specNr++);
+            else {
+                AG_CORE_ERROR("UNKNOWN MESH TEXTURE TYPE: {}", typ);
+            }
 
             shader.setFloat(
                     fmt::format("material.{}{}", typ,num),

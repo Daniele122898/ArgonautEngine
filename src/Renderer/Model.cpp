@@ -13,6 +13,7 @@ namespace Argonaut {
     }
 
     void Model::loadModel(string const& path) {
+        AG_CORE_TRACE("Loading Model {}", path);
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -27,35 +28,37 @@ namespace Argonaut {
 
     void Model::processNode(aiNode *node, const aiScene *scene) {
         // Process all the meshes contained in this node (if any)
-        for (int i = 0; i < node->mNumMeshes; ++i) {
+        for (uint i = 0; i < node->mNumMeshes; ++i) {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             m_meshes.push_back(processMesh(mesh, scene));
         }
         // then do the same for each of its children recursively
-        for (int i = 0; i < node->mNumChildren; ++i) {
+        for (uint i = 0; i < node->mNumChildren; ++i) {
             processNode(node->mChildren[i], scene);
         }
     }
 
     Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
-        vec<Vertex> verts(mesh->mNumVertices);
-        vec<uint> indx(mesh->mNumFaces*3);
+//        vec<Vertex> verts(mesh->mNumVertices);
+//        vec<uint> indx(mesh->mNumFaces*3);
+        vec<Vertex> verts;
+        vec<uint> indx;
         vec<Texture> tex;
 
         // Process vertex position, normals and texture coords
-        for (int i = 0; i < mesh->mNumVertices; ++i) {
+        for (uint i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex{};
 
-            auto& vert = mesh->mVertices[i];
+            auto vert = mesh->mVertices[i];
             vertex.Position = v3{vert.x, vert.y, vert.z};
 
-            auto& norm = mesh->mNormals[i];
+            auto norm = mesh->mNormals[i];
             vertex.Normal = v3{norm.x, norm.y, norm.z};
 
             // Check for tex coords. Assimp allows for 8 sets of texture coords
             // we don't care about that for now. Check if there's at least 1
             if (mesh->mTextureCoords[0]) {
-                auto& t = mesh->mTextureCoords[0][i];
+                auto t = mesh->mTextureCoords[0][i];
                 vertex.TexCoords = v2{t.x, t.y};
             } else {
                 vertex.TexCoords = v2{0.f, 0.f};
@@ -64,11 +67,11 @@ namespace Argonaut {
         }
 
         // Process indices
-        for (int i = 0; i < mesh->mNumFaces; ++i) {
-            aiFace& face = mesh->mFaces[i];
+        for (uint i = 0; i < mesh->mNumFaces; ++i) {
+            aiFace face = mesh->mFaces[i];
             // Technically in our case this is always 3 bcs of triangulation
             // So we could speed this up by manually unrolling!
-            for (int j = 0; j < face.mNumIndices; ++j) {
+            for (uint j = 0; j < face.mNumIndices; ++j) {
                 indx.push_back(face.mIndices[j]);
             }
         }
@@ -91,14 +94,14 @@ namespace Argonaut {
 
     vec<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
         vec<Texture> textures;
-        for (int i = 0; i < mat->GetTextureCount(type); ++i) {
+        for (uint i = 0; i < mat->GetTextureCount(type); ++i) {
             aiString str;
             mat->GetTexture(type, i, &str);
             string path = fmt::format("{}/{}", m_directory, str.C_Str());
 
             bool found = false;
             for (auto& t: m_textures) {
-                if (std::strcmp(t.GetFilePath(), path.c_str()) == 0) {
+                if (t.GetFilePath().compare(path) == 0) {
                     textures.push_back(t);
                     found = true;
                     break;
@@ -106,7 +109,7 @@ namespace Argonaut {
             }
             if (found) continue;
 
-            Texture tex{path.c_str(), typeName};
+            Texture tex(path, typeName);
             tex.LoadTexture(true);
             textures.push_back(tex);
             m_textures.push_back(tex);

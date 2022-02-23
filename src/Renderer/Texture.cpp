@@ -6,16 +6,25 @@
 
 namespace Argonaut {
 
-    Texture::Texture(const char *filePath, std::string type) {
+    Texture::Texture(std::string filePath, std::string type) {
+        AG_CORE_TRACE("CREATING TEXTURE {}", filePath);
         m_textureId = 0;
         m_width = m_height = m_bitDepth = 0;
         this->m_filePath = filePath;
         this->m_type = std::move(type);
     }
 
+    Texture::Texture(std::string filePath) {
+        AG_CORE_TRACE("CREATING TEXTURE {}", filePath);
+        m_textureId = 0;
+        m_width = m_height = m_bitDepth = 0;
+        this->m_filePath = filePath;
+    }
+
     bool Texture::LoadTexture(bool flipImage) {
+        AG_CORE_TRACE("Loading texture {}", m_filePath);
         stbi_set_flip_vertically_on_load(flipImage);
-        unsigned char *data = stbi_load(m_filePath, &m_width, &m_height, &m_bitDepth, 0);
+        unsigned char *data = stbi_load(m_filePath.c_str(), &m_width, &m_height, &m_bitDepth, 0);
         if (!data) {
             AG_CORE_ERROR("Failed to find texture: {0}", m_filePath);
             return false;
@@ -59,6 +68,7 @@ namespace Argonaut {
     }
 
     Texture::~Texture() {
+        AG_CORE_TRACE("DELETING TEXTURE {}", m_filePath);
         ClearTexture();
     }
 

@@ -6,6 +6,8 @@
 
 namespace Argonaut {
     Shader::Shader(const char *vertexPath, const char *fragmentPath) {
+        AG_CORE_TRACE("Building Shader {} {}", vertexPath, fragmentPath);
+
         // Retrieve the vertex/fragment source code from filepath
         std::string vertexCode;
         std::string fragmentCode;

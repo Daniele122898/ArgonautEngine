@@ -16,8 +16,8 @@
 namespace Argonaut {
     class Texture {
     public:
-        explicit Texture(const char *filePath, std::string type);
-
+        explicit Texture(std::string filePath);
+        explicit Texture(std::string filePath, std::string type);
 
         bool LoadTexture(bool flipImage = false);
 
@@ -29,7 +29,7 @@ namespace Argonaut {
         uint GetTextureId() const { return m_textureId; }
 
         [[nodiscard]]
-        const char* GetFilePath() const {return m_filePath; }
+        std::string_view GetFilePath() const {return m_filePath; }
 
         [[nodiscard]]
         std::string_view GetType() const { return m_type; }
@@ -44,7 +44,7 @@ namespace Argonaut {
 
         std::string m_type;
 
-        const char* m_filePath;
+        std::string m_filePath;
     };
 }
 
