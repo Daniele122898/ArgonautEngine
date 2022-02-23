@@ -7,7 +7,6 @@
 namespace Argonaut {
 
     Texture::Texture(std::string filePath, std::string type) {
-        AG_CORE_TRACE("CREATING TEXTURE {}", filePath);
         m_textureId = 0;
         m_width = m_height = m_bitDepth = 0;
         this->m_filePath = filePath;
@@ -15,7 +14,6 @@ namespace Argonaut {
     }
 
     Texture::Texture(std::string filePath) {
-        AG_CORE_TRACE("CREATING TEXTURE {}", filePath);
         m_textureId = 0;
         m_width = m_height = m_bitDepth = 0;
         this->m_filePath = filePath;
