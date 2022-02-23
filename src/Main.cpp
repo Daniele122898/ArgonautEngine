@@ -46,8 +46,6 @@ int main()
 	// Building Shader
     Argonaut::Shader shader("src/Renderer/Shaders/Simple/light_vert.glsl",
                   "src/Renderer/Shaders/Simple/light_frag.glsl");
-    Argonaut::Shader backpackShader("src/Renderer/Shaders/Simple/simple_vert.glsl",
-                            "src/Renderer/Shaders/Simple/backpack_frag.glsl");
     Argonaut::Shader lampShader("src/Renderer/Shaders/Simple/lamp_vert.glsl",
                             "src/Renderer/Shaders/Simple/lamp_frag.glsl");
 
@@ -184,11 +182,11 @@ int main()
 //    shader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     shader.setFloat("material.shininess", 32.0f);
     // set diffuse map
-    shader.setInt("material.diffuse", 0); // texture unit 0
+    shader.setInt("material.texture_diffuse1", 0); // texture unit 0
     Argonaut::Texture texture("assets/Textures/Simple/container2.png");
     texture.LoadTexture();
     // set specular map
-    shader.setInt("material.specular", 1);
+    shader.setInt("material.texture_specular1", 1);
     Argonaut::Texture specular("assets/Textures/Specular/container2_specular.png");
     specular.LoadTexture();
 
@@ -238,10 +236,6 @@ int main()
     lampShader.setMat4("view", view);
     lampShader.setMat4("projection", proj);
     lampShader.setVec3("lightColor", 1, 1, 1);
-
-    backpackShader.use();
-    backpackShader.setMat4("view", view);
-    backpackShader.setMat4("projection", proj);
 
     Argonaut::Model backpack{"assets/Models/Backpack/backpack.obj"};
 
@@ -299,6 +293,11 @@ int main()
 
         glBindVertexArray(VAO);
 
+        shader.setInt("material.texture_diffuse1", 0); // texture unit 0
+        shader.setInt("material.texture_specular1", 1);
+        texture.UseTexture(0);
+        specular.UseTexture(1);
+
         for(uint i = 0; i < 10; i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
@@ -312,14 +311,12 @@ int main()
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        backpackShader.use();
-        backpackShader.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(5.0f, 5.0f, -5.0f)); // translate it down so it's at the center of the scene
+        model = glm::translate(model, glm::vec3(3.0f, 3.0f, -5.0f)); // translate it down so it's at the center of the scene
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        backpackShader.setMat4("model", model);
+        shader.setMat4("model", model);
 
-        backpack.Draw(backpackShader);
+        backpack.Draw(shader);
 
 //		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

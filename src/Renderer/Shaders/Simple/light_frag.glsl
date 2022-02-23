@@ -2,8 +2,8 @@
 out vec4 FragColor;
 
 struct Material {
-    sampler2D diffuse;
-    sampler2D specular;
+    sampler2D texture_diffuse1;
+    sampler2D texture_specular1;
     float shininess;
 };
 
@@ -79,14 +79,14 @@ void main()
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     // ambient
-    vec3 ambient = vec3(texture(material.diffuse, TexCoords)) * light.ambient;
+    vec3 ambient = vec3(texture(material.texture_diffuse1, TexCoords)) * light.ambient;
     // Get vector that points from fragment to light
     vec3 lightDir = normalize(-light.direction);
     // get angle between light dir and normal vec
     float diff = max(dot(normal, lightDir), 0.0);
     // multiply with lightcolor resulting in darker diffuse component
     // the greater the angle between the two vectors
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, TexCoords));
 
     // specular highlight
     // reflect needs lightDir to be from light to fragment but its currently the other
@@ -94,14 +94,14 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
     vec3 reflectDir = reflect(-lightDir, normal);
     // the power is the shininess. More shininess = more reflective less diffusing
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;
+    vec3 specular = light.specular * spec * texture(material.texture_specular1, TexCoords).rgb;
 
     return (ambient + diffuse + specular);
 }
 
 vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
     // ambient
-    vec3 ambient = vec3(texture(material.diffuse, TexCoords)) * light.ambient;
+    vec3 ambient = vec3(texture(material.texture_diffuse1, TexCoords)) * light.ambient;
 
     // diffuse light
     // Get vector that points from fragment to light
@@ -110,7 +110,7 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
     float diff = max(dot(norm, lightDir), 0.0);
     // multiply with lightcolor resulting in darker diffuse component
     // the greater the angle between the two vectors
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, TexCoords));
 
     // specular highlight
     // reflect needs lightDir to be from light to fragment but its currently the other
@@ -118,7 +118,7 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
     vec3 reflectDir = reflect(-lightDir, norm);
     // the power is the shininess. More shininess = more reflective less diffusing
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;
+    vec3 specular = light.specular * spec * texture(material.texture_specular1, TexCoords).rgb;
 
     // point light
     float distance = length(light.position - FragPos);
@@ -131,7 +131,7 @@ vec3 CalcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
 
 vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
     // ambient
-    vec3 ambient = vec3(texture(material.diffuse, TexCoords)) * light.ambient;
+    vec3 ambient = vec3(texture(material.texture_diffuse1, TexCoords)) * light.ambient;
     // diffuse light
     // Get vector that points from fragment to light
     vec3 lightDir = normalize(light.position - fragPos);
@@ -145,7 +145,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
     float diff = max(dot(norm, lightDir), 0.0);
     // multiply with lightcolor resulting in darker diffuse component
     // the greater the angle between the two vectors
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, TexCoords));
 
     // specular highlight
     // reflect needs lightDir to be from light to fragment but its currently the other
@@ -153,7 +153,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
     vec3 reflectDir = reflect(-lightDir, norm);
     // the power is the shininess. More shininess = more reflective less diffusing
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * texture(material.specular, TexCoords).rgb;
+    vec3 specular = light.specular * spec * texture(material.texture_specular1, TexCoords).rgb;
 
     // point light
     float distance = length(light.position - FragPos);
