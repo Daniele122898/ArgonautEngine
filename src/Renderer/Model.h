@@ -25,13 +25,13 @@ namespace Argonaut {
         void Draw(Shader& shader);
     private:
         vec<Mesh> m_meshes;
-        vec<Texture> m_textures;
+        vec<std::shared_ptr<Texture>> m_textures;
         string m_directory;
 
         void loadModel(string const& path);
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-        vec<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+        vec<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
     };
 }
 

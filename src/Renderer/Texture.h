@@ -19,6 +19,10 @@ namespace Argonaut {
         explicit Texture(std::string filePath);
         explicit Texture(std::string filePath, std::string type);
 
+        Texture(const Texture& texture) = delete;
+        Texture(Texture&& texture) = delete;
+        Texture& operator=(const Texture& texture) = delete;
+
         bool LoadTexture(bool flipImage = false);
 
         void UseTexture() const;

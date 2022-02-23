@@ -31,9 +31,9 @@ namespace Argonaut {
         // Mesh data
         std::vector<Vertex> m_vertices;
         std::vector<uint> m_indices;
-        std::vector<Texture> m_textures;
+        std::vector<std::shared_ptr<Texture>> m_textures;
 
-        Mesh(vec<Vertex>& vertices, vec<uint>& indices, vec<Texture>& textures):
+        Mesh(vec<Vertex>& vertices, vec<uint>& indices, vec<std::shared_ptr<Texture>>& textures):
         m_vertices{std::move(vertices)}, m_indices{std::move(indices)},
         m_textures{std::move(textures)} {
             setupMesh();

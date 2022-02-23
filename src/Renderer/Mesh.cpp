@@ -41,8 +41,8 @@ namespace Argonaut {
         uint diffNr = 1;
         uint specNr = 1;
         for (uint i = 0; i < m_textures.size(); ++i) {
-            auto tex = m_textures[i];
-            auto typ = tex.GetType();
+            auto& tex = m_textures[i];
+            auto typ = tex->GetType();
             std::string num;
 
             if (typ == "texture_diffuse")
@@ -57,7 +57,7 @@ namespace Argonaut {
                     fmt::format("material.{}{}", typ,num),
                     static_cast<float>(i));
 
-            tex.UseTexture(i);
+            tex->UseTexture(i);
         }
         glActiveTexture(GL_TEXTURE0);
 

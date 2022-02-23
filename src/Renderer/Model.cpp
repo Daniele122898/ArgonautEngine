@@ -43,22 +43,22 @@ namespace Argonaut {
 //        vec<uint> indx(mesh->mNumFaces*3);
         vec<Vertex> verts;
         vec<uint> indx;
-        vec<Texture> tex;
+        vec<std::shared_ptr<Texture>> tex;
 
         // Process vertex position, normals and texture coords
         for (uint i = 0; i < mesh->mNumVertices; ++i) {
             Vertex vertex{};
 
-            auto vert = mesh->mVertices[i];
+            auto& vert = mesh->mVertices[i];
             vertex.Position = v3{vert.x, vert.y, vert.z};
 
-            auto norm = mesh->mNormals[i];
+            auto& norm = mesh->mNormals[i];
             vertex.Normal = v3{norm.x, norm.y, norm.z};
 
             // Check for tex coords. Assimp allows for 8 sets of texture coords
             // we don't care about that for now. Check if there's at least 1
             if (mesh->mTextureCoords[0]) {
-                auto t = mesh->mTextureCoords[0][i];
+                auto& t = mesh->mTextureCoords[0][i];
                 vertex.TexCoords = v2{t.x, t.y};
             } else {
                 vertex.TexCoords = v2{0.f, 0.f};
@@ -80,11 +80,11 @@ namespace Argonaut {
         if (mesh->mMaterialIndex >= 0) {
             aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-            vec<Texture> diffuseMaps = loadMaterialTextures(
+            vec<std::shared_ptr<Texture>> diffuseMaps = loadMaterialTextures(
                     material, aiTextureType_DIFFUSE, "texture_diffuse");
             tex.insert(tex.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-            vec<Texture> specularMaps = loadMaterialTextures(
+            vec<std::shared_ptr<Texture>> specularMaps = loadMaterialTextures(
                     material, aiTextureType_SPECULAR, "texture_specular");
             tex.insert(tex.end(), specularMaps.begin(), specularMaps.end());
         }
@@ -92,8 +92,8 @@ namespace Argonaut {
         return Mesh{verts, indx, tex};
     }
 
-    vec<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
-        vec<Texture> textures;
+    vec<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName) {
+        vec<std::shared_ptr<Texture>> textures;
         for (uint i = 0; i < mat->GetTextureCount(type); ++i) {
             aiString str;
             mat->GetTexture(type, i, &str);
@@ -101,7 +101,7 @@ namespace Argonaut {
 
             bool found = false;
             for (auto& t: m_textures) {
-                if (t.GetFilePath().compare(path) == 0) {
+                if (t->GetFilePath().compare(path) == 0) {
                     textures.push_back(t);
                     found = true;
                     break;
@@ -109,8 +109,9 @@ namespace Argonaut {
             }
             if (found) continue;
 
-            Texture tex(path, typeName);
-            tex.LoadTexture(true);
+//            Texture tex(path, typeName);
+            auto tex = std::make_shared<Texture>(path, typeName);
+            tex->LoadTexture(true);
             textures.push_back(tex);
             m_textures.push_back(tex);
         }
