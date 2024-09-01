@@ -30,7 +30,7 @@ namespace Argonaut {
     }
 
     void DirectionalLight::UpdateSpecular(Shader &shader, v3 specular) {
-        this->m_specular;
+        this->m_specular = specular;
         shader.setVec3("dirLight.specular", specular);
     }
 
